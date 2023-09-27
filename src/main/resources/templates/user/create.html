@@ -99,7 +99,7 @@
                                                 <div class="form-group">
                                                     <label>Choose a Role</label>
                                                     <select name="role" class="custom-select" th:field="*{role}">
-                                                        <option th:value="" th:text="Select" ></option>
+                                                        <option th:value="''" th:text="Select" ></option>
                                                         <option th:each="role : ${listOfRoles}" th:value="" th:text="Select"></option>
                                                     </select>
                                                 </div>
