@@ -29,6 +29,11 @@ public abstract class AbstractMapService <T,ID> {
         map.remove(id);
     }
 
+    // Implement the new method in CrudService here
+    void update(ID id, T object){
+        map.put(id,object);
+    }
+
 
 
 

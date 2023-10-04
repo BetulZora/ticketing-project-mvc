@@ -17,6 +17,4 @@ public class LoginController {
         return "welcome";
     }
 
-    // Line Inserted as a test
-
 }
