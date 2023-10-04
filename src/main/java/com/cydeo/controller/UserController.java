@@ -55,9 +55,6 @@ public class UserController {
     public String editUser(@PathVariable("username") String username, Model model){
         // Will use the selected user's username as a path parameter to update a user
 
-
-
-
         // Need these to be able to populate the list of roles and the users table
         model.addAttribute("listOfRoles", roleService.findAll());
         model.addAttribute("listOfUsers", userService.findAll());
@@ -77,5 +74,14 @@ public class UserController {
         return "redirect:/user/create";
 
     }
+
+    @GetMapping("/delete/{username}")
+    public String deleteUser(@PathVariable("username") String username){
+
+        userService.deleteById(username);
+
+        return "redirect:/user/create";
+    }
+
 
 }
