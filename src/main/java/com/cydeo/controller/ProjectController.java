@@ -7,10 +7,7 @@ import com.cydeo.service.ProjectService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,12 +28,13 @@ public class ProjectController {
     public String projectCreate(Model model){
 
 
-        List<UserDTO> managers = userService.findAll().stream().filter(p->p.getRole().getDescription().equals("Manager"))
-                        .collect(Collectors.toList());
+        // Will perform this action in the services, not in the Controller
+        //List<UserDTO> managers = userService.findAll().stream().filter(p->p.getRole().getDescription().equals("Manager"))
+        //                .collect(Collectors.toList());
 
         model.addAttribute("project", new ProjectDTO());
         model.addAttribute("projects", projectService.findAll());
-        model.addAttribute("managers", managers);
+        model.addAttribute("managers", userService.findManagers());
 
         return "project/create";
     }
@@ -52,4 +50,40 @@ public class ProjectController {
 
         return "redirect:/project/create";
     }
+
+    @GetMapping("/update/{projectCode}")
+    public String updateProject(@PathVariable("projectCode") String projectCode, Model model){
+
+        model.addAttribute("project", projectService.findById(projectCode));
+        model.addAttribute("projects", projectService.findAll());
+        model.addAttribute("managers", userService.findManagers());
+
+        return "project/update";
+    }
+
+    @PostMapping("/update")
+    public String updateProject(ProjectDTO projectDTO, Model model){
+
+        projectService.save(projectDTO);
+
+        return "redirect:project/create";
+    }
+
+
+    @GetMapping("/delete/{projectCode}")
+    public String delete(@PathVariable("projectCode") String projectCode){
+        projectService.deleteById(projectCode);
+        return "redirect:/project/create";
+    }
+
+
+    @GetMapping("/complete/{projectCode}")
+    public String completeProject(@PathVariable("projectCode") String projectCode){
+
+        projectService.complete(projectService.findById(projectCode));
+        return "redirect:/project/create";
+
+    }
+
+
 }
