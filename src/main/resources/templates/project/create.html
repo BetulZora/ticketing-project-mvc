@@ -32,7 +32,7 @@
                                 <div class="panel-body">
 
                                     <!-- ------------------------FORM START----------------------------- -->
-                                    <form th:object="${project}">
+                                    <form th:action="@{/project/create}" method="post" th:object="${project}">
                                         <div class="row">
                                             <div class="col">
                                                 <div class="form-group">
@@ -126,12 +126,12 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                            <tr th:each="each : ${projects}">
+                                                <td th:text="${each.projectCode}"></td>
+                                                <td th:text="${each.projectName}"></td>
+                                                <td th:text="${each.startDate + ' - ' + each.endDate}"></td>
+                                                <td th:text="${each.assignedManager.firstName + ' ' +each.assignedManager.lastName}"></td>
+                                                <td th:text="${each.status.value}"></td>
                                                 <td>
                                                     <a href="#"><button type="button" class="btn btn-warning rounded-0">Update</button></a>
                                                     <a href="#"><button type="button" class="btn btn-danger rounded-0">Delete</button></a>
