@@ -9,6 +9,7 @@ public interface UserService extends CrudService<UserDTO,String> {
 
     // on this occasionally we will need specifically the list of Managers
     List<UserDTO> findManagers();
+    List<UserDTO> findEmployees();
 
     /* Methods moved to CrudService Parent
     UserDTO save(UserDTO user);

@@ -6,6 +6,7 @@ import com.cydeo.service.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl extends AbstractMapService<ProjectDTO, String> implements ProjectService {
@@ -59,5 +60,10 @@ public class ProjectServiceImpl extends AbstractMapService<ProjectDTO, String> i
         super.save(object.getProjectCode(), object);
 
 
+    }
+
+    @Override
+    public List<ProjectDTO> findAllNonCompletedProjects() {
+        return super.findAll().stream().filter(p->p.getStatus()!= Status.COMPLETE).collect(Collectors.toList());
     }
 }
