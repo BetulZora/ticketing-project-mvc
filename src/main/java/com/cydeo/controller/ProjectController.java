@@ -42,7 +42,7 @@ public class ProjectController {
     @PostMapping("/create")
     public String insertProject(ProjectDTO project){
 
-        // Although status can be set from the controller, it is better to do it in the SericeImpl
+        // Although status can be set from the controller, it is better to do it in the ServiceImpl
         //project.setStatus(Status.OPEN);
 
         projectService.save(project);
@@ -83,6 +83,18 @@ public class ProjectController {
         projectService.complete(projectService.findById(projectCode));
         return "redirect:/project/create";
 
+    }
+
+    @GetMapping("/manager/project-status")
+    public String projectStatus(Model model){
+        // Because the view will be molded to the manager viewing it, we will have John stand in as a representative
+        UserDTO manager = userService.findById("john@cydeo.com");
+
+        // Projects are specific to the manager. Specifically retrieve John's projects
+        List<ProjectDTO> projects = projectService.getCountedListOfProjectDTO(manager);
+
+        model.addAttribute("projects", projects);
+        return "/manager/project-status";
     }
 
 

@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 public class TaskDTO {
 
-    private Long id;
+    private Long id; // this field is assigned by the database but it is a unique identifier
     private ProjectDTO project;
     private UserDTO assignedEmployee;
     private String taskSubject;
@@ -19,6 +19,7 @@ public class TaskDTO {
     private Status taskStatus;
     private LocalDate assignedDate;
 
+    // the Allargsconstructor is not needed here because the id field is not assigned at object creation
     public TaskDTO(ProjectDTO project, UserDTO assignedEmployee, String taskSubject, String taskDetail, Status taskStatus, LocalDate assignedDate) {
         this.project = project;
         this.assignedEmployee = assignedEmployee;
@@ -27,5 +28,6 @@ public class TaskDTO {
         this.taskStatus = taskStatus;
         this.assignedDate = assignedDate;
         this.id = UUID.randomUUID().getMostSignificantBits();
+        // The ID field is populated separately while saving the object
     }
 }

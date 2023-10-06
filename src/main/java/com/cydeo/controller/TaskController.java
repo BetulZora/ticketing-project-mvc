@@ -72,8 +72,10 @@ public class TaskController {
 //        return "redirect:/task/create";
 //    }
 
-    @PostMapping("/update/{id}")
+    @PostMapping("/update/{id}") // to use automatic assignment, the path variable placeholder should match the variable in the DTO
     public String updateTask(TaskDTO task) {
+        // Spring recognizes the LongId in the path param as needing to be carried into the update method
+        // if the placeholder for the path variable matches a field of the object, it automatically assigns it
         taskService.update(task);
         return "redirect:/task/create";
     }

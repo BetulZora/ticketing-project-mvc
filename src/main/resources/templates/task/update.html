@@ -34,6 +34,8 @@
                                     <!-- ------------------------FORM START----------------------------- -->
                                     <form th:action="@{/task/update/{id}(id=${task.getId()})}" method="post"
                                           th:object="${task}">
+                                        <!-- from action requires the passing of task ID as a parameter because it will
+                                         be needed in the controller-->
 
                                         <div class="row">
                                             <div class="col">

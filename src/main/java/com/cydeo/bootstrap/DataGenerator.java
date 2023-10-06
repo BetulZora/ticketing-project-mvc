@@ -8,6 +8,7 @@ import com.cydeo.enums.Gender;
 import com.cydeo.enums.Status;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.RoleService;
+import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
 import com.cydeo.service.impl.RoleServiceImpl;
 import org.springframework.boot.CommandLineRunner;
@@ -26,15 +27,17 @@ public class DataGenerator implements CommandLineRunner {
     // DataGenerator has a dependency on RoleService because we need to use
     // the hashmap in the parent of roleServiceImpl in order to save the new roles created here.
     // this simulates the use of Database.
-    RoleService roleService; // be sure the use the interface
+    RoleService roleService;
     UserService userService;
     ProjectService projectService;
-    public DataGenerator(RoleService roleService, UserService userService, ProjectService projectService) {
+    TaskService taskService;
+
+    public DataGenerator(RoleService roleService, UserService userService, ProjectService projectService, TaskService taskService) {
         this.roleService = roleService;
         this.userService = userService;
         this.projectService = projectService;
+        this.taskService = taskService;
     }
-
     @Override
     public void run(String... args) throws Exception {
 
@@ -88,13 +91,13 @@ public class DataGenerator implements CommandLineRunner {
         TaskDTO task3 = new TaskDTO(project3, user6, "Mapping", "One-To-Many", Status.COMPLETE, LocalDate.now().minusDays(8));
         TaskDTO task4 = new TaskDTO(project2, user7, "Dependency Injection", "Autowired", Status.IN_PROGRESS, LocalDate.now().minusDays(20));
 
-        /*
+
         taskService.save(task1);
         taskService.save(task2);
         taskService.save(task3);
         taskService.save(task4);
 
-         */
+
 
 
     }

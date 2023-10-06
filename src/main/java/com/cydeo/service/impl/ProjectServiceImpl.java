@@ -1,8 +1,11 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.ProjectDTO;
+import com.cydeo.dto.TaskDTO;
+import com.cydeo.dto.UserDTO;
 import com.cydeo.enums.Status;
 import com.cydeo.service.ProjectService;
+import com.cydeo.service.TaskService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +14,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl extends AbstractMapService<ProjectDTO, String> implements ProjectService {
 
+    private final TaskService taskService;
+
+    public ProjectServiceImpl(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     @Override
     public ProjectDTO save(ProjectDTO object) {
@@ -65,5 +73,31 @@ public class ProjectServiceImpl extends AbstractMapService<ProjectDTO, String> i
     @Override
     public List<ProjectDTO> findAllNonCompletedProjects() {
         return super.findAll().stream().filter(p->p.getStatus()!= Status.COMPLETE).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectDTO> getCountedListOfProjectDTO(UserDTO manager) {
+        List<ProjectDTO> projectList =
+                findAll()
+                        .stream()
+                        .filter(project -> project.getAssignedManager().equals(manager))
+                        .map( project -> { // This operation is required to calculate the two missing fields.
+
+                            List<TaskDTO> taskList = taskService.findTasksByManager(manager);
+
+                            int completeTaskCounts = (int)taskList.stream().filter(t ->  t.getProject().equals(project)
+                                    && t.getTaskStatus() == Status.COMPLETE).count();
+                            int unfinishedTaskCounts = (int)taskList.stream().filter(t ->  t.getProject().equals(project)
+                                    && t.getTaskStatus() != Status.COMPLETE).count();
+
+                            project.setCompleteTaskCounts(completeTaskCounts);
+                            project.setUnfinishedTaskCounts(unfinishedTaskCounts);
+
+                            return project;
+
+                        }).collect(Collectors.toList());
+
+
+        return projectList;
     }
 }

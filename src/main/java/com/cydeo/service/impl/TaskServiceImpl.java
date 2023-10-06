@@ -17,6 +17,7 @@ public class TaskServiceImpl extends AbstractMapService<TaskDTO, Long> implement
     @Override
     public TaskDTO save(TaskDTO object) {
 
+        // status is not a field that is populated in the form and needs to be assigned separately
         if (object.getTaskStatus() == null) {
             object.setTaskStatus(Status.OPEN);
         }
@@ -25,6 +26,9 @@ public class TaskServiceImpl extends AbstractMapService<TaskDTO, Long> implement
             object.setAssignedDate(LocalDate.now());
         }
 
+
+        // id is not a field that is assigned in the html form. It needs to be assigned separately while saving
+        // Not doing this will crash the code becuase ID is a primary key for Tasks and is not assigned at task creation
         if (object.getId() == null) {
             object.setId(UUID.randomUUID().getMostSignificantBits());
         }
