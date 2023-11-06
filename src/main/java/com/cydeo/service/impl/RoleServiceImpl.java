@@ -1,16 +1,14 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.RoleDTO;
-import com.cydeo.entity.Role;
-import com.cydeo.service.RoleService;
-import org.springframework.stereotype.Component;
+import com.cydeo.service.CrudService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 // use instead of @Component
-public class RoleServiceImpl extends AbstractMapService<RoleDTO,Long> implements RoleService {
+public class RoleServiceImpl extends AbstractMapService<RoleDTO,Long> implements CrudService<RoleDTO, Long> {
 
 
     @Override
