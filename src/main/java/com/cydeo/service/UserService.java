@@ -9,15 +9,11 @@ public interface UserService  {
     //Service layers interact with DTOs
 
     List<UserDTO> listAllUsers();
-
     UserDTO findByUserName(String username);
-
-    void save(UserDTO userDTO);
-
-    UserDTO update(UserDTO userDTO);
-
+    void save(UserDTO dto);
+    UserDTO update(UserDTO dto);
     void deleteByUserName(String username);
-
+    void delete(String username);
 
 
 }

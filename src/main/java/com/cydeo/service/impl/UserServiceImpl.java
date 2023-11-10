@@ -5,6 +5,7 @@ import com.cydeo.entity.User;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.service.UserService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,10 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> listAllUsers() {
 
-        List<User> userList = userRepository.findAll();
-
-
-        return userRepository.findAll().stream()
+        return userRepository.findAll(Sort.by("firstName")).stream()
                 .map(userMapper::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -40,6 +38,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserDTO userDTO) {
 
+        userRepository.save(userMapper.convertToEntity(userDTO));
+
     }
 
     @Override
@@ -49,6 +49,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteByUserName(String username) {
+
+    }
+
+    @Override
+    public void delete(String username) {
 
     }
 }
