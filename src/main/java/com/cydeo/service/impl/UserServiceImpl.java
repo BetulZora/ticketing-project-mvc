@@ -8,10 +8,12 @@ import com.cydeo.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -25,14 +27,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> listAllUsers() {
 
-        return userRepository.findAll(Sort.by("firstName")).stream()
+        return userRepository.findAll().stream()
+                .filter(user->user.getUserName()!=null)
                 .map(userMapper::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDTO findByUserName(String username) {
-        return null;
+
+        return userMapper.convertToDto(userRepository.findByUserName(username));
     }
 
     @Override
@@ -44,16 +48,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
-        return null;
+        User user = userRepository.findByUserName(userDTO.getUserName());
+        User updatedentity = userMapper.convertToEntity(userDTO);
+        updatedentity.setId(user.getId());
+        userRepository.save(updatedentity);
+        return findByUserName(userDTO.getUserName());
     }
 
     @Override
     public void deleteByUserName(String username) {
+        userRepository.deleteByUserName(username);
 
     }
 
     @Override
     public void delete(String username) {
+        userRepository.deleteByUserName(username);
 
     }
 }
