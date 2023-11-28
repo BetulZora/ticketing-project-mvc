@@ -51,8 +51,6 @@ public class UserController {
         model.addAttribute("user", userService.findByUserName(username) );
         return "user/update";
 
-
-
     }
 
     @PostMapping("/update")

@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
+
+        // because the UserDTO captured from the UI does not carry the ID field,
+        // capture the existing user by the UserName
+        // assign the ID to the captured DTO
+        // save the DTO, overwriting the existing user -- avoids duplicate entries.
         User user = userRepository.findByUserName(userDTO.getUserName());
         User updatedentity = userMapper.convertToEntity(userDTO);
         updatedentity.setId(user.getId());
