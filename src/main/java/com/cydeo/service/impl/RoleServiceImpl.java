@@ -28,6 +28,7 @@ public class RoleServiceImpl implements RoleService {
         // invoke the repository to return a list of roles
         // need to convert list of DTO to list of entity using Mappers
         return roleRepository.findAll().stream()
+                .filter(m->m.getDescription()!=null)
                 .map(roleMapper::convertToDto)
                 .collect(Collectors.toList());
     }

@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
         // retrieve the user we want to interact with
         User user = userRepository.findByUserName(username);
         // change the isDeleted field to true
-        user.setDeleted(true);
+        user.setIsDeleted(true);
         // save the change
         userRepository.save(user);
 

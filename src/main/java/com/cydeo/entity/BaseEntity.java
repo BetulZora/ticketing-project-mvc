@@ -21,9 +21,22 @@ public class BaseEntity {
     private Long id;
     private LocalDateTime insertDateTime;
     private Long insertUserId;
-    private LocalDateTime lastUpdateTime;
+    private LocalDateTime lastUpdateDateTime;
     private Long lastUpdateUserId;
-    private boolean isDeleted = false;
+
+    // use this field for soft delete
+    private Boolean isDeleted = false;
+
+    // use this to set BaseEnetity fields
+    public void onPrePersist(){
+        this.insertDateTime = LocalDateTime.now();
+        this.lastUpdateDateTime = LocalDateTime.now();
+
+        // these fields will be elaborated later.
+        this.insertUserId = 1L;
+        this.lastUpdateUserId = 1L;
+    }
+
 
 
 }
