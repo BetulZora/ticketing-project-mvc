@@ -6,6 +6,7 @@ import com.cydeo.service.ProjectService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,18 +33,21 @@ public class ProjectController {
 
         return "project/create";
     }
-/*
-    @PostMapping("/create")
-    public String insertProject(ProjectDTO project){
 
-        // Although status can be set from the controller, it is better to do it in the ServiceImpl
-        //project.setStatus(Status.OPEN);
+    @PostMapping("/create")
+    public String insertProject(ProjectDTO project, BindingResult bindingResult, Model model){
+
+        if (bindingResult.hasErrors())
+        {
+            model.addAttribute("projects", projectService.listAllProjects());
+            model.addAttribute("managers", userService.listAllByRole("managers"));
+            return "/project/create";
+        }
 
         projectService.save(project);
-
-
         return "redirect:/project/create";
     }
+    /*
 
     @GetMapping("/update/{projectCode}")
     public String editProject(@PathVariable("projectCode") String projectCode, Model model){

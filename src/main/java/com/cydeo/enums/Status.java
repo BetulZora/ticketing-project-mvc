@@ -5,7 +5,7 @@ public enum Status {
 
     private final String value;
 
-    private Status(String value) {
+    Status(String value) {
         this.value = value;
     }
     public String getValue(){

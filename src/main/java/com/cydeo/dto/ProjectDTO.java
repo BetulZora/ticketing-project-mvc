@@ -15,6 +15,8 @@ import java.time.LocalDate;
 
 public class ProjectDTO {
 
+
+
     private String projectName;
     private String projectCode;
     private UserDTO assignedManager;
@@ -32,8 +34,7 @@ public class ProjectDTO {
 
 
     // need this constructor in the data generator
-    public ProjectDTO(String projectName, String projectCode, UserDTO assignedManager, LocalDate startDate,
-                      LocalDate endDate, String projectDetail, Status projectStatus) {
+    public ProjectDTO(String projectName, String projectCode, UserDTO assignedManager, LocalDate startDate, LocalDate endDate, String projectDetail, Status projectStatus) {
         this.projectName = projectName;
         this.projectCode = projectCode;
         this.assignedManager = assignedManager;
