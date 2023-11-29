@@ -23,7 +23,7 @@ public class ProjectDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private String projectDetail;
-    private Status status;
+    private Status projectStatus;
 
 
     // These two were added as requirements of the view for status
@@ -40,6 +40,6 @@ public class ProjectDTO {
         this.startDate = startDate;
         this.endDate = endDate;
         this.projectDetail = projectDetail;
-        this.status = projectStatus;
+        this.projectStatus = projectStatus;
     }
 }
