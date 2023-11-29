@@ -49,11 +49,31 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void update(ProjectDTO dto) {
+        // Find current version of project
+        Project project = projectRepository.findByProjectCode(dto.getProjectCode());
+        // convert the dto to entity and assign id to entity
+        Project updatedProject = projectMapper.convertToEntity(dto);
+        updatedProject.setId(project.getId());
+        // we also need to get the status as well
+        updatedProject.setProjectStatus(project.getProjectStatus());
+        // save
+        projectRepository.save(updatedProject);
 
     }
 
     @Override
     public void delete(String code) {
+        Project project = projectRepository.findByProjectCode(code);
+        project.setIsDeleted(true);
+        projectRepository.save(project);
+
+    }
+
+    @Override
+    public void complete(String code) {
+        Project project = projectRepository.findByProjectCode(code);
+        project.setProjectStatus(Status.COMPLETE);
+        projectRepository.save(project);
 
     }
 }
