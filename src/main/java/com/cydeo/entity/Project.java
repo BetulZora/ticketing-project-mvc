@@ -17,6 +17,7 @@ import java.time.LocalDate;
 public class Project extends BaseEntity{
 
     private String projectName;
+    @Column(unique = true)
     private String projectCode;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="manager_id")

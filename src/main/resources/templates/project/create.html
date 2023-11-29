@@ -54,6 +54,7 @@
                                                 <div class="form-group">
                                                     <label>Assigned Manager</label>
                                                     <select th:field="*{assignedManager}" class="custom-select">
+                                                        <option th:value="''" th:text = "Select"></option>
                                                         <option th:each="manager : ${managers}" th:value="${manager.userName}" th:text="${manager.firstName + ' ' + manager.lastName}"></option>
                                                     </select>
                                                 </div>
