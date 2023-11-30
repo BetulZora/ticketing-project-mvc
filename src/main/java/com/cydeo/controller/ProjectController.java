@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.ProjectDTO;
 import com.cydeo.dto.UserDTO;
+import com.cydeo.entity.Project;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -86,26 +87,15 @@ public class ProjectController {
         return "redirect:/project/create";
     }
 
-
-
-
-
-/*
-
-
     @GetMapping("/manager/project-status")
     public String projectStatus(Model model){
-        // Because the view will be molded to the manager viewing it, we will have John stand in as a representative
-        UserDTO manager = userService.findById("john@cydeo.com");
-
-        // Projects are specific to the manager. Specifically retrieve John's projects
-        List<ProjectDTO> projects = projectService.getCountedListOfProjectDTO(manager);
+        List<ProjectDTO> projects = projectService.listAllProjectDetails();
 
         model.addAttribute("projects", projects);
         return "/manager/project-status";
     }
 
- */
+
 
 
 }
