@@ -77,16 +77,25 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void delete(String code) {
         Project project = projectRepository.findByProjectCode(code);
+
         project.setIsDeleted(true);
+        // to free up the project code for future project, modify the project code
+        project.setProjectCode(project.getProjectCode() + "-" + project.getId());
         projectRepository.save(project);
 
+        // the tasks associated with the project must also be deleted
+
+        taskService.deleteByProject(projectMapper.convertToDTO(project));
     }
 
     @Override
     public void complete(String code) {
         Project project = projectRepository.findByProjectCode(code);
         project.setProjectStatus(Status.COMPLETE);
+
         projectRepository.save(project);
+
+        taskService.completeByProject(projectMapper.convertToDTO(project));
 
     }
 

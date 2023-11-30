@@ -1,9 +1,11 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.ProjectDTO;
 import com.cydeo.dto.TaskDTO;
 import com.cydeo.entity.Project;
 import com.cydeo.entity.Task;
 import com.cydeo.enums.Status;
+import com.cydeo.mapper.ProjectMapper;
 import com.cydeo.mapper.TaskMapper;
 import com.cydeo.repository.ProjectRepository;
 import com.cydeo.repository.TaskRepository;
@@ -22,11 +24,14 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, ProjectRepository projectRepository) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper,
+                           ProjectRepository projectRepository, ProjectMapper projectMapper) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.projectRepository = projectRepository;
+        this.projectMapper = projectMapper;
     }
 
     @Override
@@ -60,7 +65,9 @@ public class TaskServiceImpl implements TaskService {
 
         if(task.isPresent()){
             convertedTask.setId(task.get().getId());
-            convertedTask.setTaskStatus(task.get().getTaskStatus());
+            // using ternary. If dto status is null, this is an update from the form and we will use use the status in the DB
+            // if dto is not null, it means we are saving a change in the task status (ex. completing the task)
+            convertedTask.setTaskStatus(dto.getTaskStatus()== null ? task.get().getTaskStatus(): dto.getTaskStatus());
             convertedTask.setAssignedDate(task.get().getAssignedDate());
             taskRepository.save(convertedTask);
         }
@@ -86,5 +93,25 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Integer totalCompletedTasks(String projectCode) {
         return taskRepository.totalCompletedTasks(projectCode);
+    }
+
+    @Override
+    public void deleteByProject(ProjectDTO project) {
+        List<TaskDTO> list = listAllByProject(project);
+        list.forEach(taskDTO -> delete(taskDTO.getId()));
+    }
+
+    @Override
+    public void completeByProject(ProjectDTO project) {
+        List<TaskDTO> list = listAllByProject(project);
+        list.forEach(taskDTO -> {
+            taskDTO.setTaskStatus(Status.COMPLETE);
+            update(taskDTO);
+        });
+    }
+
+    private List<TaskDTO> listAllByProject(ProjectDTO project) {
+        List<Task> list = taskRepository.findAllByProject(projectMapper.convertToEntity(project));
+        return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
     }
 }
