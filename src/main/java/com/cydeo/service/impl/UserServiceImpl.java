@@ -10,6 +10,7 @@ import com.cydeo.repository.UserRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +26,13 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProjectService projectService;
     private final TaskService taskService;
+        /*
+    ASIDE: projectServiceImpl depends on userServiceImpl  and that in turn depends on projectServiceImpl
+    this creates a circular been dependency much like the converter issue.
+    use @Lazy in the constructor to prevent this.
+     */
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ProjectService projectService, TaskService taskService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService, TaskService taskService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
@@ -102,13 +108,13 @@ public class UserServiceImpl implements UserService {
         if(checkIfUserCanBeDeleted(user)){
             // change the isDeleted field to true
             user.setIsDeleted(true);
+            // change the username because client wants to reuse usernames in the future
+            user.setUserName(user.getUserName() + "-" +user.getId());
             // save the change
             userRepository.save(user);
         }else {
             // we will throw an exception later
         }
-
-
     }
 
     @Override

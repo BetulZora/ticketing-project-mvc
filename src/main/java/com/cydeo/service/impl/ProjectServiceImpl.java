@@ -8,11 +8,10 @@ import com.cydeo.enums.Status;
 import com.cydeo.mapper.ProjectMapper;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.ProjectRepository;
-import com.cydeo.repository.TaskRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
-import org.springframework.data.domain.Sort;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +25,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final TaskService taskService;
+    /*
+    ASIDE: projectServiceImpl depends on userServiceImpl  and that in turn depends on projectServiceImpl
+    this creates a circular been dependency much like the converter issue.
+    use @Lazy in the constructor to prevent this.
+     */
 
     public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper,
-                              UserService userService, UserMapper userMapper, TaskService taskService) {
+                              @Lazy UserService userService, UserMapper userMapper, TaskService taskService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
         this.userService = userService;
