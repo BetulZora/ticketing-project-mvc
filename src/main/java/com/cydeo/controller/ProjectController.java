@@ -1,8 +1,6 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.ProjectDTO;
-import com.cydeo.dto.UserDTO;
-import com.cydeo.entity.Project;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -29,7 +27,9 @@ public class ProjectController {
 
 
         model.addAttribute("project", new ProjectDTO());
-        model.addAttribute("projects", projectService.listAllProjects());
+        //changing the project listing method so that the view shows the projects restricted by loggedInManager
+        //model.addAttribute("projects", projectService.listAllProjects());
+        model.addAttribute("projects", projectService.listAllProjectDetails());
         model.addAttribute("managers", userService.listAllByRole("manager"));
 
         return "project/create";
@@ -40,7 +40,9 @@ public class ProjectController {
 
         if (bindingResult.hasErrors())
         {
-            model.addAttribute("projects", projectService.listAllProjects());
+            //changing the project listing method so that the view shows the projects restricted by loggedInManager
+            //model.addAttribute("projects", projectService.listAllProjects());
+            model.addAttribute("projects", projectService.listAllProjectDetails());
             model.addAttribute("managers", userService.listAllByRole("managers"));
             return "/project/create";
         }

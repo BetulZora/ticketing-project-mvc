@@ -32,7 +32,8 @@ public class UserServiceImpl implements UserService {
     use @Lazy in the constructor to prevent this.
      */
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService, TaskService taskService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService,
+                           TaskService taskService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
