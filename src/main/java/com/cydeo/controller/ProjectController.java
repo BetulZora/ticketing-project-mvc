@@ -69,7 +69,9 @@ public class ProjectController {
     public String editProject(@PathVariable("projectCode") String projectCode, Model model){
 
         model.addAttribute("project", projectService.getByProjectCode(projectCode));
-        model.addAttribute("projects", projectService.listAllProjects());
+        //changing the project listing method so that the view shows the projects restricted by loggedInManager
+        //model.addAttribute("projects", projectService.listAllProjects());
+        model.addAttribute("projects", projectService.listAllProjectDetails());
         model.addAttribute("managers", userService.listAllByRole("manager"));
 
         return "project/update";
@@ -79,7 +81,9 @@ public class ProjectController {
     public String updateProject(@ModelAttribute("project")ProjectDTO project, BindingResult bindingResult, Model model){
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("projects", projectService.listAllProjects());
+            //changing the project listing method so that the view shows the projects restricted by loggedInManager
+            //model.addAttribute("projects", projectService.listAllProjects());
+            model.addAttribute("projects", projectService.listAllProjectDetails());
             model.addAttribute("managers", userService.listAllByRole("manager"));
             return "/project/update";
 

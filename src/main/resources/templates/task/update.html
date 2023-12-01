@@ -137,8 +137,13 @@
                                                 <td th:text="${#temporals.format(task.assignedDate,'MM/dd/yyyy')}"></td>
                                                 <td th:text="${task.taskStatus.value}"></td>
                                                 <td>
-                                                    <a th:href="@{/task/update/{id}(id=${task.getId()})}"
-                                                       class="btn btn-warning rounded-0">Update</a>
+                                                    <a th:if="${task.taskStatus.getValue() != 'Completed'}"
+                                                       class="btn btn-warning rounded-0"
+                                                       th:href="@{/task/update/{id}(id=${task.getId()})}">Update
+                                                    </a>
+                                                    <a th:if="${task.taskStatus.getValue() == 'Completed'}"
+                                                       class="btn btn-warning rounded-0 disabled-button">Update
+                                                    </a>
                                                     <a th:href="@{/task/delete/{id}(id=${task.getId()})}"
                                                        class="btn btn-danger rounded-0">Delete</a>
                                                 </td>
