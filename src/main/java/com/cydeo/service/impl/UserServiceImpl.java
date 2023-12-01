@@ -1,9 +1,14 @@
 package com.cydeo.service.impl;
 
+
+import com.cydeo.dto.ProjectDTO;
+import com.cydeo.dto.TaskDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.User;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.service.ProjectService;
+import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,10 +23,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ProjectService projectService;
+    private final TaskService taskService;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ProjectService projectService, TaskService taskService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.projectService = projectService;
+        this.taskService = taskService;
     }
 
     @Override
@@ -66,15 +75,40 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     * This is a helper method for delete. It will check if a user is available for deleting
+     */
+    private boolean checkIfUserCanBeDeleted(User user){
+        switch (user.getRole().getDescription()){
+            case "Manager":
+                // check the size of the list of projects. If more than zero, he has unfinished business
+                List<ProjectDTO> projectDTOList = projectService.readAllByAssignedManager(user);
+                return projectDTOList.size() == 0;
+
+            case "Employee":
+                List<TaskDTO> taskDTOList = taskService.readAllByAssignedEmployee(user);
+                return taskDTOList.size() == 0;
+            default:
+                return true;
+
+        }
+    }
     @Override
     public void delete(String username) {
         // use this to avoid permanent deletion from the database vs deleteByUserName
         // retrieve the user we want to interact with
         User user = userRepository.findByUserName(username);
-        // change the isDeleted field to true
-        user.setIsDeleted(true);
-        // save the change
-        userRepository.save(user);
+
+        if(checkIfUserCanBeDeleted(user)){
+            // change the isDeleted field to true
+            user.setIsDeleted(true);
+            // save the change
+            userRepository.save(user);
+        }else {
+            // we will throw an exception later
+        }
+
+
     }
 
     @Override

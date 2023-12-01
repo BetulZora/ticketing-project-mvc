@@ -128,6 +128,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<TaskDTO> readAllByAssignedEmployee(User assignedEmployee) {
+        List<Task> list = taskRepository.findAllByAssignedEmployee(assignedEmployee);
+        return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
     public Integer totalNonCompletedTasks(String projectCode) {
         return taskRepository.totalNonCompletedTasks(projectCode);
     }
