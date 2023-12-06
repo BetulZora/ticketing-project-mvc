@@ -4,19 +4,9 @@ import com.cydeo.service.SecurityService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -54,12 +44,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests()
-                .antMatchers("/user/**").hasRole("ADMIN") // those with Admin role can access any method is the user controller
-                .antMatchers("/project/**").hasRole("MANAGER") // those with Manager role can access any method in the project controller
-                .antMatchers("/task/employee/**").hasRole("EMPLOYEE")
-                .antMatchers("/task/**").hasRole("EMPLOYEE")
-                //.antMatchers("/task/**").hasAnyRole("EMPLOYEE", "ADMIN")
-                //.antMatchers("task/**").hasAuthority("ROLE_EMPLOYEE")
+                .antMatchers("/user/**").hasAuthority("Admin") // those with Admin role can access any method is the user controller
+                .antMatchers("/project/**").hasAuthority("Manager") // those with Manager role can access any method in the project controller
+                .antMatchers("/task/employee/**").hasAuthority("Employee")
+                .antMatchers("/task/**").hasAuthority("Manager")
+                //.antMatchers("/task/**").hasAnyRole("Employee", "Admin")
+                //.antMatchers("task/**").hasAuthority("ROLE_Employee")
                 .antMatchers( // these are endpoints that can be visualized without authentication
                         "/", "/login", "/fragments/**", "/assets/**", "/images/**"
                 ).permitAll()
