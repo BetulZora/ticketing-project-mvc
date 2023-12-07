@@ -17,10 +17,28 @@ public class UserDTO {
     private String lastName;
     private String userName;
     private String passWord;
+    private String confirmPassWord;
     private boolean enabled;
     private String phone;
     private RoleDTO role;
     private Gender gender;
+
+    public String getConfirmPassWord() {
+        return confirmPassWord;
+    }
+
+    public void setConfirmPassWord(String confirmPassWord) {
+        this.confirmPassWord = confirmPassWord;
+        checkConfirmPassWord();
+    }
+
+    private void checkConfirmPassWord() {
+        if(this.passWord == null || this.confirmPassWord == null){
+            return;
+        }else if(!this.passWord.equals(confirmPassWord)){
+            this.confirmPassWord = null;
+        }
+    }
 
     public String getFirstName() {
         return firstName;

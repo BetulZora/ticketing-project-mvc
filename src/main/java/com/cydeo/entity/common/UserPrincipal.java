@@ -59,6 +59,7 @@ import java.util.List;
 
         @Override
         public boolean isEnabled() {
+
             return this.user.isEnabled();
         }
 

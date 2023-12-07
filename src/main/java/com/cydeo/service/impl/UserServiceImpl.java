@@ -34,7 +34,8 @@ public class UserServiceImpl implements UserService {
     use @Lazy in the constructor to prevent this.
      */
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,@Lazy ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
+                           ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
@@ -60,8 +61,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserDTO userDTO) {
 
+        // during development, we will set enabled to true but this must be activated by user when deployed
+        //userDTO.setEnabled(true);
+        System.out.println("userDTO.getPassWord() = " + userDTO.getPassWord());
+
+        // want to save encrypted password, not plain password
         User obj = userMapper.convertToEntity(userDTO);
-        obj.setPassWord(passwordEncoder.encode(obj.getPassWord()));
+        obj.setPassWord(passwordEncoder.encode(userDTO.getPassWord()));
+        System.out.println("obj.getPassWord() = " + obj.getPassWord());
+        obj.setEnabled(true);
 
         userRepository.save(obj);
 
