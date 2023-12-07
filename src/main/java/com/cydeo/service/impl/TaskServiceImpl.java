@@ -13,6 +13,7 @@ import com.cydeo.repository.TaskRepository;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -121,7 +122,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskDTO> listAllTasksByStatus(Status taskStatus) {
         // reminder: hardcoding an employee that is logged in
-        User loggedInEmployee = userRepository.findByUserName("john@employee.com");
+        // User loggedInEmployee = userRepository.findByUserName("john@employee.com");
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedInEmployee = userRepository.findByUserName(username);
+
         List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(taskStatus, loggedInEmployee);
 
         return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
