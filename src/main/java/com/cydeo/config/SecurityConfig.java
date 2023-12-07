@@ -43,15 +43,22 @@ public class SecurityConfig {
     // use this part to have the login page recognized as a page that does not require security
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests()
-                .antMatchers("/user/**").hasAuthority("Admin") // those with Admin role can access any method is the user controller
-                .antMatchers("/project/**").hasAuthority("Manager") // those with Manager role can access any method in the project controller
+        return http
+                .authorizeRequests()
+//                .antMatchers("/user/**").hasRole("Admin")
+                .antMatchers("/user/**").hasAuthority("Admin")
+                .antMatchers("/project/**").hasAuthority("Manager")
                 .antMatchers("/task/employee/**").hasAuthority("Employee")
                 .antMatchers("/task/**").hasAuthority("Manager")
-                //.antMatchers("/task/**").hasAnyRole("Employee", "Admin")
-                //.antMatchers("task/**").hasAuthority("ROLE_Employee")
-                .antMatchers( // these are endpoints that can be visualized without authentication
-                        "/", "/login", "/fragments/**", "/assets/**", "/images/**"
+//                .antMatchers("/task/**").hasAnyRole("EMPLOYEE","ADMIN")
+//                .antMatchers("task/**").hasAuthority("ROLE_EMPLOYEE")
+
+                .antMatchers(
+                        "/",
+                        "/login",
+                        "/fragments/**",
+                        "/assets/**",
+                        "/images/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
