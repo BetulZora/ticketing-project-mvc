@@ -12,6 +12,7 @@ import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,18 +27,19 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProjectService projectService;
     private final TaskService taskService;
+    private final PasswordEncoder passwordEncoder;
         /*
     ASIDE: projectServiceImpl depends on userServiceImpl  and that in turn depends on projectServiceImpl
     this creates a circular been dependency much like the converter issue.
     use @Lazy in the constructor to prevent this.
      */
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService,
-                           TaskService taskService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,@Lazy ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
         this.taskService = taskService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -58,7 +60,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserDTO userDTO) {
 
-        userRepository.save(userMapper.convertToEntity(userDTO));
+        User obj = userMapper.convertToEntity(userDTO);
+        obj.setPassWord(passwordEncoder.encode(obj.getPassWord()));
+
+        userRepository.save(obj);
 
     }
 
