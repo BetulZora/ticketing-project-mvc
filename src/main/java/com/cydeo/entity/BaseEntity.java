@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
+@EntityListeners(BaseEntityListener.class)
 public class BaseEntity {
 
     @Id
@@ -19,24 +20,31 @@ public class BaseEntity {
 
     // use attributes of the @Column annotation to prevent update of the initial creation date.
     @Column(nullable = false, updatable = false)
-    private LocalDateTime insertDateTime;
+    protected LocalDateTime insertDateTime;
     @Column(nullable = false, updatable = false)
-    private Long insertUserId;
+    protected Long insertUserId;
     @Column(nullable = false)
-    private LocalDateTime lastUpdateDateTime;
+    protected LocalDateTime lastUpdateDateTime;
     @Column(nullable = false)
-    private Long lastUpdateUserId;
+    protected Long lastUpdateUserId;
 
     // use this field for soft delete
-    private Boolean isDeleted = false;
+    public Boolean isDeleted = false;
 
+
+
+    /* PrePersist and PreUpdate have been moved to BaseEntityListener
     // use these methods to set BaseEntity fields
     @PrePersist // This is what to assign on new entries in DB tables
     public void onPrePersist(){
         this.insertDateTime = LocalDateTime.now();
         this.lastUpdateDateTime = LocalDateTime.now();
 
-        // these fields will be elaborated later.
+        // these fields will be elaborated later. hardcoded as 1L temporarily
+        //this.insertUserId = 1L;
+        //this.lastUpdateUserId = 1L;
+
+        // use a listener to get this information
         this.insertUserId = 1L;
         this.lastUpdateUserId = 1L;
     }
@@ -46,6 +54,8 @@ public class BaseEntity {
         this.lastUpdateDateTime = LocalDateTime.now();
         this.lastUpdateUserId = 1L;
     }
+
+     */
 
 
 

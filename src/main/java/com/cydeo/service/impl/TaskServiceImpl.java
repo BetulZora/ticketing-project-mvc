@@ -97,7 +97,9 @@ public class TaskServiceImpl implements TaskService {
         // only employees will be using this method and they will be performing this as themselves
         // to avoid this issue, we will assume that a given Employee is logged in
         // making an exception: normally, would not use repositories for other entities.
-        User loggedInEmployee = userRepository.findByUserName("john@employee.com");
+        // User loggedInEmployee = userRepository.findByUserName("john@employee.com");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedInEmployee = userRepository.findByUserName(username);
         List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(taskStatus, loggedInEmployee);
 
         return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
