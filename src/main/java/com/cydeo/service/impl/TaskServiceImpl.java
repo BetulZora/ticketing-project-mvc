@@ -13,6 +13,8 @@ import com.cydeo.repository.TaskRepository;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -98,9 +100,13 @@ public class TaskServiceImpl implements TaskService {
         // to avoid this issue, we will assume that a given Employee is logged in
         // making an exception: normally, would not use repositories for other entities.
         // User loggedInEmployee = userRepository.findByUserName("john@employee.com");
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User loggedInEmployee = userRepository.findByUserName(username);
-        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(taskStatus, loggedInEmployee);
+
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        SimpleKeycloakAccount details = (SimpleKeycloakAccount) authentication.getDetails();
+        String username = details.getKeycloakSecurityContext().getToken().getPreferredUsername();
+
+        User loggedInUser = userRepository.findByUserName(username);
+        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(taskStatus, loggedInUser);
 
         return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
     }
@@ -126,10 +132,13 @@ public class TaskServiceImpl implements TaskService {
         // reminder: hardcoding an employee that is logged in
         // User loggedInEmployee = userRepository.findByUserName("john@employee.com");
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User loggedInEmployee = userRepository.findByUserName(username);
 
-        List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(taskStatus, loggedInEmployee);
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        SimpleKeycloakAccount details = (SimpleKeycloakAccount) authentication.getDetails();
+        String username = details.getKeycloakSecurityContext().getToken().getPreferredUsername();
+
+        User loggedInUser = userRepository.findByUserName(username);
+        List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(taskStatus, loggedInUser);
 
         return list.stream().map(taskMapper::convertToDto).collect(Collectors.toList());
     }

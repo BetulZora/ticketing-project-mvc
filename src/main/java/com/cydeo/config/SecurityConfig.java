@@ -1,85 +1,48 @@
 package com.cydeo.config;
 
-import com.cydeo.service.SecurityService;
+import org.keycloak.adapters.KeycloakConfigResolver;
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @Configuration
-public class SecurityConfig {
-
-    private final SecurityService securityService;
-    private final AuthSuccessHandler authSuccessHandler;
-
-    public SecurityConfig(SecurityService securityService, AuthSuccessHandler authSuccessHandler) {
-        this.securityService = securityService;
-        this.authSuccessHandler = authSuccessHandler;
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(jsr250Enabled = true)
+public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.authorizeRequests().anyRequest().permitAll();
+        http.csrf().disable();
     }
 
-    // this is the second part of what is needed to implement multiple users with varying authorizations
-  /*  @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder){
-        // UserDetailsService is an interface that carries out security related services
-        // includes the CRUD operations
-        // UserDetailsService uses a User object to call a UI view
-        // the User class is inherent to Spring
-
-        // loadByUserName(User user) is the method we are the most interested in
-
-        // this is a list in order to carry more than one user
-        List<UserDetails> userList = new ArrayList<>();
-
-        userList.add(new User("mike", encoder.encode("password"), Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"))));
-        userList.add(new User("ozzy", encoder.encode("password"), Arrays.asList(new SimpleGrantedAuthority("ROLE_MANAGER"))));
-
-        return new InMemoryUserDetailsManager(userList);
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
+        auth.authenticationProvider(keycloakAuthenticationProvider);
     }
 
-   */
-
-    // use this part to have the login page recognized as a page that does not require security
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeRequests()
-//                .antMatchers("/user/**").hasRole("Admin")
-                .antMatchers("/user/**").hasAuthority("Admin")
-                .antMatchers("/project/**").hasAuthority("Manager")
-                .antMatchers("/task/employee/**").hasAuthority("Employee")
-                .antMatchers("/task/**").hasAuthority("Manager")
-//                .antMatchers("/task/**").hasAnyRole("EMPLOYEE","ADMIN")
-//                .antMatchers("task/**").hasAuthority("ROLE_EMPLOYEE")
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
 
-                .antMatchers(
-                        "/",
-                        "/login",
-                        "/fragments/**",
-                        "/assets/**",
-                        "/images/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-                .and()
-//                .httpBasic()
-                .formLogin()
-                .loginPage("/login")
-//                    .defaultSuccessUrl("/welcome")
-                .successHandler(authSuccessHandler)
-                .failureUrl("/login?error=true")
-                .permitAll()
-                .and()
-                .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login")
-                .and()
-                .rememberMe()
-                .tokenValiditySeconds(120)
-                .key("cydeo")
-                .userDetailsService(securityService)
-                .and().build();
+    @Bean
+    public KeycloakConfigResolver KeycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
     }
 
 }
-

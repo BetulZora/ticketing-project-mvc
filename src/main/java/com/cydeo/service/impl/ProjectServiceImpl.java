@@ -11,7 +11,9 @@ import com.cydeo.repository.ProjectRepository;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -110,7 +112,10 @@ public class ProjectServiceImpl implements ProjectService {
         //UserDTO currentUserDTO = userService.findByUserName("mike@gmail.com");
 
         // to capture manager from security use SecurityContextHolder
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        SimpleKeycloakAccount details = (SimpleKeycloakAccount) authentication.getDetails();
+        String username = details.getKeycloakSecurityContext().getToken().getPreferredUsername();
+
         UserDTO currentUserDTO = userService.findByUserName(username);
 
         User user = userMapper.convertToEntity(currentUserDTO);

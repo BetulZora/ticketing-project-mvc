@@ -1,74 +1,85 @@
 package com.cydeo.controller;
 
 
+import com.cydeo.annotation.DefaultExceptionMessage;
 import com.cydeo.dto.UserDTO;
-import com.cydeo.service.RoleService;
+import com.cydeo.entity.ResponseWrapper;
+import com.cydeo.exception.TicketingProjectException;
 import com.cydeo.service.UserService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/user")
+import javax.annotation.security.RolesAllowed;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/user")
+@Tag(name = "UserController",description = "User API")
 public class UserController {
 
-    private final RoleService roleService;
     private final UserService userService;
 
-    public UserController(RoleService roleService, UserService userService) {
-        this.roleService = roleService;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/create")
-    public String openUserCreate(Model model){
-
-        model.addAttribute("user", new UserDTO());
-        model.addAttribute("listOfRoles", roleService.listAllRoles());
-        model.addAttribute("listOfUsers", userService.listAllUsers());
-
-        return "/user/create";
+    @GetMapping
+    @RolesAllowed("Admin")
+    @Operation(summary = "Get Users")
+    public ResponseEntity<ResponseWrapper> getUsers(){
+        List<UserDTO> userDTOList = userService.listAllUsers();
+        return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved",userDTOList, HttpStatus.OK));
     }
 
+    @GetMapping("/{userName}")
+    @RolesAllowed("Admin")
+    @Operation(summary = "Get User By Username")
+    public ResponseEntity<ResponseWrapper> getUserByUserName(@PathVariable("userName") String userName){
+        UserDTO user = userService.findByUserName(userName);
+        return ResponseEntity.ok(new ResponseWrapper("User is successfully retrieved",user,HttpStatus.OK));
+    }
 
-
-    @PostMapping("/create")
-    public String insertUser(@ModelAttribute("user") UserDTO user, Model model){
+    @PostMapping
+    @RolesAllowed("Admin")
+    @Operation(summary = "Create User")
+    public ResponseEntity<ResponseWrapper> createUser(@RequestBody UserDTO user){
         userService.save(user);
-        return "redirect:/user/create";
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseWrapper("User is successfully created",HttpStatus.CREATED));
     }
 
-
-    @GetMapping("/update/{username}") // use the username as a path parameter
-    public String editUser(@PathVariable("username") String username, Model model){
-        // Will use the selected user's username as a path parameter to update a user
-
-        // Need these to be able to populate the list of roles and the users table
-        model.addAttribute("listOfRoles", roleService.listAllRoles());
-        model.addAttribute("listOfUsers", userService.listAllUsers());
-
-        // I need to send my chosen user from path parameter instead of a new userDTO
-        model.addAttribute("user", userService.findByUserName(username) );
-        return "user/update";
-
-    }
-
-    @PostMapping("/update")
-    public String postUpdate(@ModelAttribute("user") UserDTO user){
-
+    @PutMapping
+    @RolesAllowed("Admin")
+    @Operation(summary = "Update User")
+    public ResponseEntity<ResponseWrapper> updateUser(@RequestBody UserDTO user){
         userService.update(user);
-
-        return "redirect:/user/create";
-
+        return ResponseEntity.ok(new ResponseWrapper("User is successfully updated",user,HttpStatus.OK));
     }
 
-    @GetMapping("/delete/{username}")
-    public String deleteUser(@PathVariable("username") String username){
+    @DeleteMapping("/{userName}")
+    @RolesAllowed("Admin")
+    @Operation(summary = "Delete User")
+    @DefaultExceptionMessage(defaultMessage = "Failed to delete user")
+    public ResponseEntity<ResponseWrapper> deleteUser(@PathVariable("userName") String userName) throws TicketingProjectException{
+        userService.delete(userName);
+        return ResponseEntity.ok(new ResponseWrapper("User is successfully deleted",HttpStatus.OK));
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponseWrapper("User is successfully created",HttpStatus.CREATED));
 
-        userService.delete(username);
-
-        return "redirect:/user/create";
+        //204 - HttpStatus.NO_CONTENT
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

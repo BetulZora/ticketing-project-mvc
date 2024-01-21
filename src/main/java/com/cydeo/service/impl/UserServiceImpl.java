@@ -5,12 +5,13 @@ import com.cydeo.dto.ProjectDTO;
 import com.cydeo.dto.TaskDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.User;
+import com.cydeo.exception.TicketingProjectException;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.service.KeycloakService;
 import com.cydeo.service.ProjectService;
 import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final ProjectService projectService;
     private final TaskService taskService;
     private final PasswordEncoder passwordEncoder;
+    private final KeycloakService keycloakService;
         /*
     ASIDE: projectServiceImpl depends on userServiceImpl  and that in turn depends on projectServiceImpl
     this creates a circular been dependency much like the converter issue.
@@ -35,12 +37,13 @@ public class UserServiceImpl implements UserService {
      */
 
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
-                           ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder) {
+                           ProjectService projectService, TaskService taskService, PasswordEncoder passwordEncoder, KeycloakService keycloakService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
         this.taskService = taskService;
         this.passwordEncoder = passwordEncoder;
+        this.keycloakService = keycloakService;
     }
 
     @Override
@@ -61,6 +64,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserDTO userDTO) {
 
+        userDTO.setEnabled(true);
+
         // during development, we will set enabled to true but this must be activated by user when deployed
         //userDTO.setEnabled(true);
         System.out.println("userDTO.getPassWord() = " + userDTO.getPassWord());
@@ -69,9 +74,10 @@ public class UserServiceImpl implements UserService {
         User obj = userMapper.convertToEntity(userDTO);
         obj.setPassWord(passwordEncoder.encode(userDTO.getPassWord()));
         System.out.println("obj.getPassWord() = " + obj.getPassWord());
-        obj.setEnabled(true);
 
         userRepository.save(obj);
+
+        keycloakService.userCreate(userDTO);
 
     }
 
@@ -114,7 +120,7 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public void delete(String username) {
+    public void delete(String username) throws TicketingProjectException {
         // use this to avoid permanent deletion from the database vs deleteByUserName
         // retrieve the user we want to interact with
         User user = userRepository.findByUserName(username);
@@ -126,8 +132,9 @@ public class UserServiceImpl implements UserService {
             user.setUserName(user.getUserName() + "-" +user.getId());
             // save the change
             userRepository.save(user);
+            keycloakService.delete(username);
         }else {
-            // we will throw an exception later
+            throw new TicketingProjectException("User can not be deleted");
         }
     }
 
